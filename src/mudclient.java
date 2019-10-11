@@ -391,6 +391,13 @@ public class mudclient extends GameConnection {
     private int referid;
     private int anInt827;
     private int controlLoginNewOk;
+    private int controlRegisterUser;
+    private int controlRegisterPassword;
+    private int controlRegisterConfirmPassword;
+    private int controlRegisterSubmit;
+    private int controlRegisterCancel;
+    private int controlRegisterCheckbox;
+    private int controlRegisterStatus;
     private int teleportBubbleType[];
     private Panel panelLoginWelcome;
     private int combatTimeout;
@@ -2419,24 +2426,33 @@ public class mudclient extends GameConnection {
             controlWelcomeExistinguser = panelLoginWelcome.addButton(x, 250 + y, 200, 35);
         }
         panelLoginNewuser = new Panel(surface, 50);
-        y = 230;
-        if (referid == 0) {
-            panelLoginNewuser.addText(x, y + 8, "To create an account please go back to the", 4, true);
-            y += 20;
-            panelLoginNewuser.addText(x, y + 8, "www.runescape.com front page, and choose 'create account'", 4, true);
-        } else if (referid == 1) {
-            panelLoginNewuser.addText(x, y + 8, "To create an account please click on the", 4, true);
-            y += 20;
-            panelLoginNewuser.addText(x, y + 8, "'create account' link below the game window", 4, true);
-        } else {
-            panelLoginNewuser.addText(x, y + 8, "To create an account please go back to the", 4, true);
-            y += 20;
-            panelLoginNewuser.addText(x, y + 8, "runescape front webpage and choose 'create account'", 4, true);
-        }
-        y += 30;
-        panelLoginNewuser.addButtonBackground(x, y + 17, 150, 34);
-        panelLoginNewuser.addText(x, y + 17, "Ok", 5, false);
-        controlLoginNewOk = panelLoginNewuser.addButton(x, y + 17, 150, 34);
+        y = 70;
+        controlRegisterStatus = panelLoginNewuser.addText(x, y + 8, "To create an account please enter all the requested details", 4, true);
+        int relY = y + 25;
+        panelLoginNewuser.addButtonBackground(x, relY + 17, 250, 34);
+        panelLoginNewuser.addText(x, relY + 8, "Choose a Username", 4, false);
+        controlRegisterUser = panelLoginNewuser.addTextInput(x, relY + 25, 200, 40, 4, 12, false, false);
+        panelLoginNewuser.setFocus(controlRegisterUser);
+        relY += 40;
+        panelLoginNewuser.addButtonBackground(x - 115, relY + 17, 220, 34);
+        panelLoginNewuser.addText(x - 115, relY + 8, "Choose a Password", 4, false);
+        controlRegisterPassword = panelLoginNewuser.addTextInput(x - 115, relY + 25, 220, 40, 4, 20, true, false);
+        panelLoginNewuser.addButtonBackground(x + 115, relY + 17, 220, 34);
+        panelLoginNewuser.addText(x + 115, relY + 8, "Confirm Password", 4, false);
+        controlRegisterConfirmPassword = panelLoginNewuser.addTextInput(x + 115, relY + 25, 220, 40, 4, 20, true, false);
+        relY += 60;
+        controlRegisterCheckbox = panelLoginNewuser.addCheckbox(x - 196 - 7, relY - 7, 14, 14);
+        panelLoginNewuser.addString(x - 181, relY, "I have read and agree to the terms+conditions listed at:", 4, true);
+        relY += 15;
+        panelLoginNewuser.addText(x, relY, "http://www.runescape.com/runeterms.html", 4, true);
+        relY += 20;
+        panelLoginNewuser.addButtonBackground(x - 100, relY + 17, 150, 34);
+        panelLoginNewuser.addText(x - 100, relY + 17, "Submit", 5, false);
+        controlRegisterSubmit = panelLoginNewuser.addButton(x - 100, relY + 17, 150, 34);
+        panelLoginNewuser.addButtonBackground(x + 100, relY + 17, 150, 34);
+        panelLoginNewuser.addText(x + 100, relY + 17, "Cancel", 5, false);
+        controlRegisterCancel = panelLoginNewuser.addButton(x + 100, relY + 17, 150, 34);
+
         panelLoginExistinguser = new Panel(surface, 50);
         y = 230;
         controlLoginStatus = panelLoginExistinguser.addText(x, y - 10, "Please enter your username and password", 4, true);
@@ -6894,7 +6910,7 @@ public class mudclient extends GameConnection {
                 return;
             }
         } catch (RuntimeException runtimeexception) {
-            if (packetErrorCount < 3) {
+//            if (packetErrorCount < 3) {
                 String s1 = runtimeexception.toString();
                 int slen = s1.length();
                 super.clientStream.newPacket(Opcode.getClient(Version.CLIENT, Command.Client.CL_PACKET_EXCEPTION));
@@ -6911,7 +6927,7 @@ public class mudclient extends GameConnection {
                 super.clientStream.putString(s1);
                 super.clientStream.sendPacket();
                 packetErrorCount++;
-            }
+//            }
             super.clientStream.closeStream();
             resetLoginVars();
         }
@@ -7281,7 +7297,7 @@ public class mudclient extends GameConnection {
                                 menuItemsCount++;
                             }
                             menuItemText1[menuItemsCount] = "Examine";
-                            menuItemText2[menuItemsCount] = "@cya@" + GameData.wallObjectName[id];
+                            menuItemText2[menuItemsCount] = "@cya@" + GameData.wallObjectName[id] + " (@ora@" + id + "@cya@,@ora@" + (wallObjectX[idx] + regionX) + "@cya@,@ora@" + (wallObjectY[idx] + regionY) + "@cya@)";
                             menuItemID[menuItemsCount] = 3300;
                             menuSourceType[menuItemsCount] = id;
                             menuItemsCount++;
@@ -7336,7 +7352,7 @@ public class mudclient extends GameConnection {
                                 menuItemsCount++;
                             }
                             menuItemText1[menuItemsCount] = "Examine";
-                            menuItemText2[menuItemsCount] = "@cya@" + GameData.objectName[id];
+							menuItemText2[menuItemsCount] = "@cya@" + GameData.objectName[id] + " (@ora@" + id + "@cya@,@ora@" + (objectX[idx] + regionX) + "@cya@,@ora@" + (objectY[idx] + regionY) + "@cya@)";
                             menuItemID[menuItemsCount] = 3400;
                             menuSourceType[menuItemsCount] = id;
                             menuItemsCount++;
@@ -7438,8 +7454,15 @@ public class mudclient extends GameConnection {
             super.worldFullTimeout--;
         if (loginScreen == 0) {
             panelLoginWelcome.handleMouse(super.mouseX, super.mouseY, super.lastMouseButtonDown, super.mouseButtonDown);
-            if (panelLoginWelcome.isClicked(controlWelcomeNewuser))
+            if (panelLoginWelcome.isClicked(controlWelcomeNewuser)) {
                 loginScreen = 1;
+                panelLoginNewuser.updateText(controlRegisterUser, "");
+                panelLoginNewuser.updateText(controlRegisterPassword, "");
+                panelLoginNewuser.updateText(controlRegisterConfirmPassword, "");
+                panelLoginNewuser.setFocus(controlRegisterUser);
+                panelLoginNewuser.toggleCheckbox(controlRegisterCheckbox, false);
+                panelLoginNewuser.updateText(controlRegisterStatus, "To create an account please enter all the requested details");
+            }
             if (panelLoginWelcome.isClicked(controlWelcomeExistinguser)) {
                 loginScreen = 2;
                 panelLoginExistinguser.updateText(controlLoginStatus, "Please enter your username and password");

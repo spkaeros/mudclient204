@@ -134,7 +134,7 @@ public class GameConnection extends GameShell {
             //clientStream.putBytes(buffer.buffer, 0, buffer.offset);
 
             clientStream.flushPacket();
-            clientStream.seedIsaac(ai);
+//            clientStream.seedIsaac(ai);
             int resp = clientStream.readStream();
             System.out.println("login response:" + resp);
             if (resp == 25) {
@@ -324,7 +324,7 @@ public class GameConnection extends GameShell {
     private void handlePacket(Command.Server opcode, int ptype, int psize) {
         //ptype = clientStream.isaacCommand(ptype);
         System.out.println(String.format("opcode:%s(%d) psize:%d", opcode.name(), ptype, psize));
-        System.out.println("opcode:" + opcode + " psize:" + psize);
+//         System.out.println("opcode:" + opcode + " psize:" + psize);
         if (opcode == Command.Server.SV_MESSAGE) {
             String s = new String(incomingPacket, 1, psize - 1);
             showServerMessage(s);
