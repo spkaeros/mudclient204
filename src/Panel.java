@@ -665,6 +665,10 @@ public class Panel {
         controlListEntryMouseButtonDown[control] = (activated ? 1 : 0);
     }
 
+    public boolean isActivated(int control) {
+        return controlListEntryMouseButtonDown[control] != 0;
+    }
+
     public void clearList(int control) {
         controlListEntryCount[control] = 0;
     }

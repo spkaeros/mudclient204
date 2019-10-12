@@ -236,6 +236,8 @@ public class mudclient extends GameConnection {
     private int appearanceHeadGender;
     private String loginUser;
     private String loginPass;
+    private String registerUser;
+    private String registerPassword;
     private int showDialogSocialInput;
     private int cameraAngle;
     private int anInt707;
@@ -5078,7 +5080,7 @@ public class mudclient extends GameConnection {
         welcomScreenAlreadyShown = false;
         surface.interlace = false;
         surface.blackScreen();
-        if (loginScreen == 0 || loginScreen == 1 || loginScreen == 2 || loginScreen == 3) {
+        if (loginScreen == 0 || loginScreen == 2) {
             int i = (loginTimer * 2) % 3072;
             if (i < 1024) {
                 surface.drawSprite(0, 10, spriteLogo);
@@ -5746,7 +5748,7 @@ public class mudclient extends GameConnection {
 
     protected void showLoginScreenStatus(String s, String s1) {
         if (loginScreen == 1)
-            panelLoginNewuser.updateText(anInt827, s + " " + s1);
+            panelLoginNewuser.updateText(controlRegisterStatus, s + " " + s1);
         if (loginScreen == 2)
             panelLoginExistinguser.updateText(controlLoginStatus, s + " " + s1);
         loginUserDisp = s1;
@@ -6910,7 +6912,7 @@ public class mudclient extends GameConnection {
                 return;
             }
         } catch (RuntimeException runtimeexception) {
-//            if (packetErrorCount < 3) {
+            if (packetErrorCount < 3) {
                 String s1 = runtimeexception.toString();
                 int slen = s1.length();
                 super.clientStream.newPacket(Opcode.getClient(Version.CLIENT, Command.Client.CL_PACKET_EXCEPTION));
@@ -6927,7 +6929,7 @@ public class mudclient extends GameConnection {
                 super.clientStream.putString(s1);
                 super.clientStream.sendPacket();
                 packetErrorCount++;
-//            }
+            }
             super.clientStream.closeStream();
             resetLoginVars();
         }
@@ -7473,8 +7475,40 @@ public class mudclient extends GameConnection {
             }
         } else if (loginScreen == 1) {
             panelLoginNewuser.handleMouse(super.mouseX, super.mouseY, super.lastMouseButtonDown, super.mouseButtonDown);
-            if (panelLoginNewuser.isClicked(controlLoginNewOk)) {
+            if (panelLoginNewuser.isClicked(controlRegisterCancel)) {
                 loginScreen = 0;
+            }
+            if(panelLoginNewuser.isClicked(controlRegisterUser)) {
+                panelLoginNewuser.setFocus(controlRegisterPassword);
+            }
+            if(panelLoginNewuser.isClicked(controlRegisterPassword)) {
+                panelLoginNewuser.setFocus(controlRegisterConfirmPassword);
+            }
+            if(panelLoginNewuser.isClicked(controlRegisterConfirmPassword) || panelLoginNewuser.isClicked(controlRegisterSubmit)) {
+                String username = panelLoginNewuser.getText(controlRegisterUser);
+                String pass = panelLoginNewuser.getText(controlRegisterPassword);
+                String confPass = panelLoginNewuser.getText(controlRegisterConfirmPassword);
+                if(username == null || username.length() <= 0 || pass == null || pass.length() <= 0 || confPass == null || confPass.length() <= 0) {
+                    return;
+                }
+                if(!pass.equals(confPass)) {
+                    panelLoginNewuser.updateText(controlRegisterStatus, "@yel@The two passwords entered are not the same as each other!");
+                    return;
+                }
+                if(pass.length() < 5 || pass.length() > 20) {
+                    panelLoginNewuser.updateText(controlRegisterStatus, "@yel@Your password must be between 5 and 20 characters long.");
+                    return;
+                }
+                if(!panelLoginNewuser.isActivated(controlRegisterCheckbox)) {
+                    panelLoginNewuser.updateText(controlRegisterStatus, "@yel@You must agree to the terms+conditions to continue");
+                    return;
+                }
+                panelLoginNewuser.updateText(controlRegisterStatus, "Please wait... Creating new account");
+                drawLoginScreens();
+                resetTimings();
+                registerUser = panelLoginNewuser.getText(controlRegisterUser);
+                registerPassword = panelLoginNewuser.getText(controlRegisterPassword);
+                registerAccount(registerUser, registerPassword);
                 return;
             }
         } else if (loginScreen == 2) {
